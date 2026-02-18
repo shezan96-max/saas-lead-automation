@@ -1,0 +1,8 @@
+python-dotenv
+requests
+fastapi
+uvicorn
+pydantic[email]
+gspread
+oauth2client
+google-auth

@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+.env
+*.db
+clients/*/config.json
+clients/*/leads.db
+config/service_account.json
