@@ -1,8 +1,7 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
-
-SHEET_NAME = "SaaS_Leads"
+from config.config import GOOGLE_SHEET_ID
 
 def log_to_sheet(data):
     scope = [
@@ -10,11 +9,11 @@ def log_to_sheet(data):
         "https://www.googleapis.com/auth/drive"
     ]
 
-    creds = ServiceAccountCredentials.from_json_keyfile_name("config/service_account.json",scope)
+    creds = ServiceAccountCredentials.from_json_keyfile_name("/etc/secrets/service_account.json",scope)
 
     client = gspread.authorize(creds)
-
-    sheet = client.open(SHEET_NAME).sheet1
+    sheet_id = GOOGLE_SHEET_ID
+    sheet = client.open(id).sheet1
 
     sheet.append_row([
         data.name,
