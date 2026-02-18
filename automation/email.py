@@ -13,10 +13,12 @@ def send_email(to_email,subject,body):
     message["Subject"] = subject
     
     message.attach(MIMEText(body,"plain"))
-
-    server = smtplib.SMTP(SMTP_SERVER,SMTP_PORT)
-    server.starttls()
-    server.login(EMAIL_SENDER,EMAIL_PASSWORD)
-    server.sendmail(EMAIL_SENDER,to_email,message.as_string())
-    server.quit()
-    
+    try:
+        server = smtplib.SMTP(SMTP_SERVER,SMTP_PORT,timeout=30)
+        server.starttls()
+        server.login(EMAIL_SENDER,EMAIL_PASSWORD)
+        server.sendmail(EMAIL_SENDER,to_email,message.as_string())
+        server.quit()
+    except Exception as e:
+        print("Email error:",str(e))
+        raise e
