@@ -13,7 +13,7 @@ def log_to_sheet(data):
 
     client = gspread.authorize(creds)
     sheet_id = GOOGLE_SHEET_ID
-    sheet = client.open(sheet_id).sheet1
+    sheet = client.open_by_key(sheet_id).sheet1
 
     sheet.append_row([
         data.name,
