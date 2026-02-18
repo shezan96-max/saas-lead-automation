@@ -1,10 +1,20 @@
 import sqlite3
 import os
 
-def init_db(client_name : str):
-    os.makedirs(f"clients/{client_name}",exist_ok=True)
+BASE_DIR = "/opt/render/project/src"
+CLIENTS_DIR = os.path.join(BASE_DIR,"clients")
 
-    db_path = f"clients/{client_name}/leads.db"
+os.makedirs(CLIENTS_DIR,exist_ok=True)
+
+def get_db_path(client_name : str):
+    client_folder = os.path.join(CLIENTS_DIR,client_name)
+    os.makedirs(client_folder,exist_ok=True)
+    
+    return os.path.join(client_folder,"leads.db")
+
+def init_db(client_name : str):
+
+    db_path = get_db_path(client_name)
 
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -29,7 +39,7 @@ def init_db(client_name : str):
     print("Database initialized successfully")
 
 def save_lead(client_name : str,data : dict):
-    db_path = f"clients/{client_name}/leads.db"
+    db_path = 
 
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
