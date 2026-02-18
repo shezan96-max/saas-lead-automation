@@ -17,7 +17,7 @@ def send_email(to_email,subject,body):
         "textContent": body
     }
 
-    response = requests.post(url,json=payload,headers=headers,timout=15)
+    response = requests.post(url,json=payload,headers=headers,timeout=15)
 
     print(response.status_code)
     print(response.text)
