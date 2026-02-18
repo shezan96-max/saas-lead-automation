@@ -6,4 +6,3 @@ pydantic[email]
 gspread
 oauth2client
 google-auth
-resend
