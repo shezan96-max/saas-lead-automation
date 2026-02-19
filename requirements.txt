@@ -6,3 +6,4 @@ pydantic[email]
 gspread
 oauth2client
 google-auth
+psycopg2-binary
