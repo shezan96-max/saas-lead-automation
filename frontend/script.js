@@ -3,12 +3,11 @@ document.getElementById("leadForm").addEventListener("submit",async function(e) 
     const formData = new FormData(this);
     const data = Object.fromEntries(formData.entries());
 
-    await fetch("/submit-lead?client_name=demo", {
+    await fetch("/submit-lead", {
         method: "POST",
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify(data)
     });
 
-    alert("Lead Submitted!");
-    this.reset();
+    window.location.href = `/ui/dashboard.html?client=${data.company}`;
 })

@@ -121,8 +121,6 @@ def export_hot_leads(client_name : str):
     return FileResponse(filename,media_type="text/csv",filename=filename)
 
 @app.get("/analytics/{client_name}")
-def analytics(client_name : str,x_api_key : str = Header(None)):
-    if x_api_key != ADMIN_API_KEY:
-        raise HTTPException(status_code=403,detail="Unauthorized")
+def analytics(client_name : str):
     return get_lead_stats(client_name)
 
