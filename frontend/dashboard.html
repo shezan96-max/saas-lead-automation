@@ -1,32 +1,132 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Admin Dashboard</title>
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        <div class="container">
-            <h1>Admin Dashboard</h1>
+<head>
+  <title>Analytics Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-            <div class="cards">
-                <div class="card">
-                    <h3>Total Leads</h3>
-                    <p id="total">0</p>
-                </div>
-                <div class="card hot">
-                    <h3>HOT</h3>
-                    <p id="hot">0</p>
-                </div>
-                <div class="card warm">
-                    <h3>WARM</h3>
-                    <p id="warm">0</p>
-                </div>
-                <div class="card cold">
-                    <h3>COLD</h3>
-                    <p id="cold">0</p>
-                </div>
-            </div>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-950 text-white">
+  <div id="loader" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
+    <div class="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+
+<div class="flex h-screen">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-gray-900 border-r border-white/10 p-6 flex flex-col">
+    <h1 class="text-2xl font-bold mb-10 text-indigo-400">LeadOS</h1>
+
+    <nav class="flex flex-col gap-4 text-gray-300">
+      <a href="#" class="hover:text-white transition">📊 Dashboard</a>
+      <a href="#" class="hover:text-white transition">📁 Leads</a>
+      <a href="#" class="hover:text-white transition">📈 Analytics</a>
+      <a href="#" class="hover:text-white transition">⚙ Settings</a>
+    </nav>
+
+    <div class="mt-auto text-xs text-gray-500 pt-10">
+      Premium SaaS Demo
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+
+    <!-- Topbar -->
+    <header class="h-16 bg-gray-900 border-b border-white/10 flex items-center justify-between px-8">
+      <h2 class="text-lg font-semibold">Client Dashboard</h2>
+      <div class="text-sm text-gray-400">
+        AI Lead Automation
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <main class="flex-1 overflow-y-auto p-8 space-y-10">
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-4 gap-6">
+
+        <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 p-6 rounded-2xl shadow-xl">
+          <h3 class="text-sm opacity-80">Total Leads</h3>
+          <p id="total" class="text-3xl font-bold mt-2">0</p>
         </div>
-        <script src="dashboard.js"></script>
-    </body>
+
+        <div class="bg-gradient-to-br from-red-600 to-red-800 p-6 rounded-2xl shadow-xl">
+          <h3 class="text-sm opacity-80">Hot</h3>
+          <p id="hot" class="text-3xl font-bold mt-2">0</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-yellow-500 to-yellow-700 p-6 rounded-2xl shadow-xl">
+          <h3 class="text-sm opacity-80">Warm</h3>
+          <p id="warm" class="text-3xl font-bold mt-2">0</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-blue-500 to-blue-700 p-6 rounded-2xl shadow-xl">
+          <h3 class="text-sm opacity-80">Cold</h3>
+          <p id="cold" class="text-3xl font-bold mt-2">0</p>
+        </div>
+
+      </div>
+
+      <!-- Chart Section -->
+      <div class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-white/10">
+        <h2 class="text-xl font-semibold mb-6">Lead Distribution</h2>
+        <canvas id="leadChart"></canvas>
+      </div>
+
+      <!-- Leads Table -->
+      <div class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-white/10">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-semibold">All Leads</h2>
+            <button onclick="exportLeads()" class="bg-indigo-600 hover:bg-indigo-700 transition px-4 py-2 rounded-xl test-sm font-semibold shadow-lg">Export CSV</button>
+            <!-- Search -->
+          <input 
+            type="text" 
+            id="searchInput"
+            placeholder="Search leads..."
+            class="bg-gray-800 border border-white/10 px-4 py-2 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+
+            <!-- Status Filter -->
+          <div class="flex gap-3">
+            <button onclick="setFilter('all')" class="filterBtn bg-gray-700 px-4 py-2 rounded-xl text-sm">All</button>
+            <button onclick="setFilter('hot')" class="filterBtn bg-red-600 px-4 py-2 rounded-xl text-sm">Hot</button>
+            <button onclick="setFilter('warm')" class="filterBtn bg-yellow-600 px-4 py-2 rounded-xl text-sm">Warm</button>
+            <button onclick="setFilter('cold')" class="filterBtn bg-blue-600 px-4 py-2 rounded-xl text-sm">Cold</button>
+          </div>
+
+        </div>
+
+
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-left text-sm">
+            <thead class="border-b border-white/10 text-gray-400">
+              <tr>
+                <th class="py-3 px-4">ID</th>
+                <th class="py-3 px-4">Name</th>
+                <th class="py-3 px-4">Email</th>
+                <th class="py-3 px-4">Company</th>
+                <th class="py-3 px-4">Budget</th>
+                <th class="py-3 px-4">Score</th>
+                <th class="py-3 px-4">Status</th>
+                <th class="py-3 px-4">Date</th>
+              </tr>
+            </thead>
+            <tbody id="leadsTable" class="divide-y divide-white/10"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+</div>
+
+</body>
+
+
 </html>

@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi import Header,HTTPException
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import StreamingResponse
 from api.schemas import LeadCreate
 from database.db import get_connection,init_db,save_lead,update_lead_status,get_lead_stats,filter_leads
 from automation.email import send_email
@@ -13,6 +14,7 @@ from services.duplicate import is_duplicate
 from services.rate_limit import check_rate_limit
 from services.config_loader import load_client_config
 import csv
+import io
 import os
 from config.config import ADMIN_API_KEY
 
@@ -93,29 +95,60 @@ def update_status(client_name : str,lead_id : int,status : str):
         "message" : "Status updated"
     }
 @app.get("/leads/{client_name}")
-def get_leads(client_name : str,status : str = None,min_score : int = None):
-    return filter_leads(client_name,status,min_score)
-
-@app.get("/export-hot-leads/{client_name}")
-def export_hot_leads(client_name : str):
+def get_leads(client_name : str):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""SELECT id, name,email,company,budget,score,status FROM leads WHERE client_name=%s AND status='HOT'""", (client_name,))
+    cursor.execute("""
+        SELECT id, name, email, company, budget, score, status, created_at 
+        FROM leads 
+        WHERE client_name = %s
+        ORDER BY created_at DESC  
+    """, (client_name,))
+    rows = cursor.fetchall()
+    conn.close()
+
+    leads = []
+    for row in rows:
+        leads.append({
+            "id" : row[0],
+            "name" : row[1],
+            "email" : row[2],
+            "company" : row[3],
+            "budget" : row[4],
+            "score" : row[5],
+            "status" : row[6],
+            "created_at" : str(row[7])
+        })
+    return leads
+
+
+@app.get("/export-hot-leads/{client_name}")
+def export_csv(client_name : str):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id, name, email, company, budget, score, status, created_at
+        FROM leads
+        WHERE client_name = %s
+        ORDER BY created_at DESC""", (client_name,))
 
     rows = cursor.fetchall()
     conn.close()
 
-    filename = f"{client_name}_hot_leads.csv"
+    output = io.StringIO()
+    writer = csv.writer(output)
+    filename = f"{client_name}_leads.csv"
 
-    with open(filename,mode="w",newline="",encoding="utf-8") as f:
-        writer = csv.writer(f)
+    
 
-        writer.writerow(["ID","Name","Email","Company","Budget","Score","Status"])
+    writer.writerow(["ID","Name","Email","Company","Budget","Score","Status","Date"])
 
-        writer.writerows(rows)
+    writer.writerows(rows)
+    output.seek(0)
 
-    return FileResponse(filename,media_type="text/csv",filename=filename)
+    return StreamingResponse(output,media_type="text/csv",headers={"Content-Disposition" : f"attachment; filename={filename}"})
 
 @app.get("/analytics/{client_name}")
 def analytics(client_name : str):
