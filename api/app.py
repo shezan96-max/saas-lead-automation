@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi import Header,HTTPException
 from fastapi.staticfiles import StaticFiles
 from api.schemas import LeadCreate
-from database.db import init_db,save_lead,update_lead_status,get_lead_stats,filter_leads
+from database.db import get_connection,init_db,save_lead,update_lead_status,get_lead_stats,filter_leads
 from automation.email import send_email
 from automation.sheets import log_to_sheet
 from automation.slack import notify_hot_lead
@@ -32,7 +32,7 @@ def health():
 def submit_lead(lead : LeadCreate):
     client_name = lead.company
     config = load_client_config(client_name)
-    init_db(client_name)
+    init_db()
 
     lead_dict = lead.dict()
 
@@ -61,7 +61,7 @@ def submit_lead(lead : LeadCreate):
         lead_dict["sales_rep"] = "Nurture Campaign"
 
     # 6. Save to DB
-    save_lead(client_name,lead_dict)
+    save_lead(client_name, lead_dict)
     
     # 7. Slack notify only if HOT
     if status == "HOT":
@@ -84,7 +84,7 @@ def submit_lead(lead : LeadCreate):
         "status" : "Lead saved, Slack notification sent, Email sent, Sheet updated.",
     }
 
-@app.put("/update-status-{lead_id}")
+@app.put("/update-status/{lead_id}")
 def update_status(client_name : str,lead_id : int,status : str):
     update_lead_status(client_name,lead_id,status)
 
@@ -98,13 +98,10 @@ def get_leads(client_name : str,status : str = None,min_score : int = None):
 
 @app.get("/export-hot-leads/{client_name}")
 def export_hot_leads(client_name : str):
-    db_path = f"clients/{client_name}/leads.db"
-
-    import sqlite3
-    conn = sqlite3.connect(db_path)
+    conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT name,email,company,budget,score,status FROM leads WHERE status='HOT'")
+    cursor.execute("""SELECT id, name,email,company,budget,score,status FROM leads WHERE client_name=%s AND status='HOT'""", (client_name,))
 
     rows = cursor.fetchall()
     conn.close()

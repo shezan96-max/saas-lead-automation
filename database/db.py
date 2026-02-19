@@ -1,27 +1,18 @@
-import sqlite3
-import os
+import psycopg2
+from config.config import DATABASE_URL
 
-BASE_DIR = "/opt/render/project/src"
-CLIENTS_DIR = os.path.join(BASE_DIR,"clients")
 
-os.makedirs(CLIENTS_DIR,exist_ok=True)
+def get_connection():
+    return psycopg2.connect(DATABASE_URL)
 
-def get_db_path(client_name : str):
-    client_folder = os.path.join(CLIENTS_DIR,client_name)
-    os.makedirs(client_folder,exist_ok=True)
-    
-    return os.path.join(client_folder,"leads.db")
 
-def init_db(client_name : str):
-
-    db_path = get_db_path(client_name)
-
-    conn = sqlite3.connect(db_path)
+def init_db():
+    conn = get_connection()
     cursor = conn.cursor()
-
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS leads (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
+        client_name TEXT NOT NULL,
         name TEXT,
         email TEXT,
         company TEXT,
@@ -36,19 +27,17 @@ def init_db(client_name : str):
     """)
     conn.commit()
     conn.close()
-    print("Database initialized successfully")
+    print("Database initialized successfully !!")
 
 def save_lead(client_name : str,data : dict):
-    db_path = get_db_path(client_name)
-
-    conn = sqlite3.connect(db_path)
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        INSERT INTO leads (name,
-        email, company, budget, message, score, status, sales_rep)
-        VALUES (?,?,?,?,?,?,?,?)
+    INSERT INTO leads (client_name, name, email, company, budget, message, score, status, sales_rep) 
+    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """, (
+        client_name,
         data["name"],
         data["email"],
         data["company"],
@@ -58,58 +47,55 @@ def save_lead(client_name : str,data : dict):
         data["status"],
         data["sales_rep"]
     ))
-
+    
     conn.commit()
     conn.close()
-    print("Leads saved to database successfully")
+    print("Data saved to Database successfully !!!")
 
 def update_lead_status(client_name,lead_id,status):
-    db_path = get_db_path(client_name)
-    conn = sqlite3.connect(db_path)
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-    UPDATE leads
-    SET status = ?
-    WHERE id = ?
-    """,(status,lead_id))
-
+        UPDATE leads 
+        SET status=%s 
+        WHERE id=%s AND client_name=%s
+    """, (status, lead_id, client_name))
+    
     conn.commit()
     conn.close()
+    print("Lead status updated successfully !!!")
 
 def fetch_all_leads(client_name):
-    db_path = get_db_path(client_name)
-    conn = sqlite3.connect(db_path)
+    conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM leads")
+    cursor.execute("SELECT * FROM leads WHERE client_name=%s",(client_name,))
     rows = cursor.fetchall()
 
     conn.close()
     return rows
 
 def get_lead_stats(client_name):
-    db_path = get_db_path(client_name)
-
-    conn = sqlite3.connect(db_path)
+    conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT COUNT(*) FROM leads")
+    cursor.execute("SELECT COUNT(*) FROM leads WHERE client_name=%s",(client_name,))
     total = cursor.fetchone()[0]
 
-    cursor.execute("SELECT COUNT(*) FROM leads WHERE status='HOT'")
+    cursor.execute("SELECT COUNT(*) FROM leads WHERE client_name=%s AND status='HOT'",(client_name,))
     hot = cursor.fetchone()[0]
 
-    cursor.execute("SELECT COUNT(*) FROM leads WHERE status='WARM'")
+    cursor.execute("SELECT COUNT(*) FROM leads WHERE client_name=%s AND status='WARM'",(client_name,))
     warm = cursor.fetchone()[0]
 
-    cursor.execute("SELECT COUNT(*) FROM leads WHERE status='COLD'")
+    cursor.execute("SELECT COUNT(*) FROM leads WHERE client_name=%s AND status='COLD'",(client_name,))
     cold = cursor.fetchone()[0]
 
-    cursor.execute("SELECT AVG(budget) FROM leads")
+    cursor.execute("SELECT AVG(budget) FROM leads WHERE client_name=%s",(client_name,))
     avg_budget = cursor.fetchone()[0] or 0
 
-    cursor.execute("SELECT AVG(score) FROM leads")
+    cursor.execute("SELECT AVG(score) FROM leads WHERE client_name=%s",(client_name,))
     avg_score = cursor.fetchone()[0] or 0
 
     conn.close()
@@ -117,28 +103,25 @@ def get_lead_stats(client_name):
     return {
         "total" : total,
         "hot" : hot,
-        "warm" : cold,
+        "warm" : warm,
         "cold" : cold,
         "avg_budget" : round(avg_budget,2),
         "avg_score" : round(avg_score,2)
     }
 
 def filter_leads(client_name,status=None,min_score=None):
-    db_path = get_db_path(client_name)
-
-    conn = sqlite3.connect(db_path)
+    conn = get_connection()
     cursor = conn.cursor()
 
-    query = "SELECT * FROM leads WHERE 1=1"
-
-    params = []
+    query = "SELECT * FROM leads WHERE client_name=%s"
+    params = [client_name]
 
     if status:
-        query += " AND status=?"
+        query += " AND status=%s"
         params.append(status)
 
     if min_score:
-        query += " AND score>=?"
+        query += " AND score >= %s"
         params.append(min_score)
 
     cursor.execute(query,params)
