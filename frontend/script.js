@@ -9,5 +9,5 @@ document.getElementById("leadForm").addEventListener("submit",async function(e) 
         body: JSON.stringify(data)
     });
 
-    window.location.href = `/ui/dashboard.html?client=${data.company}`;
+    window.location.href = `/dashboard.html?client=${data.company}`;
 })
