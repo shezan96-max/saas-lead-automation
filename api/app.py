@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi import Header,HTTPException
 from fastapi.staticfiles import StaticFiles
 from api.schemas import LeadCreate
-from database.db import init_db,save_lead,update_lead_status,fetch_all_leads,get_lead_stats,filter_leads
+from database.db import init_db,save_lead,update_lead_status,get_lead_stats,filter_leads
 from automation.email import send_email
 from automation.sheets import log_to_sheet
 from automation.slack import notify_hot_lead
@@ -17,6 +17,8 @@ import os
 from config.config import ADMIN_API_KEY
 
 app = FastAPI()
+
+app.mount("/ui",StaticFiles(directory="frontend",html=True),name="ui")
 
 @app.on_event("startup")
 def startup():
