@@ -39,7 +39,7 @@ def init_db(client_name : str):
     print("Database initialized successfully")
 
 def save_lead(client_name : str,data : dict):
-    db_path = 
+    db_path = get_db_path(client_name)
 
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -64,7 +64,7 @@ def save_lead(client_name : str,data : dict):
     print("Leads saved to database successfully")
 
 def update_lead_status(client_name,lead_id,status):
-    db_path = f"clients/{client_name}/leads.db"
+    db_path = get_db_path(client_name)
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
@@ -78,7 +78,7 @@ def update_lead_status(client_name,lead_id,status):
     conn.close()
 
 def fetch_all_leads(client_name):
-    db_path = f"clients/{client_name}/leads.db"
+    db_path = get_db_path(client_name)
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
@@ -89,7 +89,7 @@ def fetch_all_leads(client_name):
     return rows
 
 def get_lead_stats(client_name):
-    db_path = f"clients/{client_name}/leads.db"
+    db_path = get_db_path(client_name)
 
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -124,7 +124,7 @@ def get_lead_stats(client_name):
     }
 
 def filter_leads(client_name,status=None,min_score=None):
-    db_path = f"clients/{client_name}/leads.db"
+    db_path = get_db_path(client_name)
 
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
