@@ -1,45 +1,32 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Dashboard</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-
+        <title>Admin Dashboard</title>
+        <link rel="stylesheet" href="style.css">
     </head>
-    <body class="bg-gray-100 p-10">
+    <body>
+        <div class="container">
+            <h1>Admin Dashboard</h1>
 
-    <h1 class="text-3xl font-bold mb-8">Client Dashboard</h1>
-    <div id="stats" class="grid grid-cols-4 gap-6"></div>
-
-    <script>
-        async function loadStats() {
-            const res = await fetch("/analytics?client_name=demo");
-            const data = await res.json();
-            document.getElementByID("stats").innerHTML = `
-            
-                <div class="bg-white p-6 rounded-xl shadow">
-                    <h2 class="text-xl font-semibold">Total</h2>
-                    <p class="text-2xl mt-2">$ {data.total}</p>  
+            <div class="cards">
+                <div class="card">
+                    <h3>Total Leads</h3>
+                    <p id="total">0</p>
                 </div>
-                <div class="bg-red-100 p-6 rounded-xl shadow">
-                    <h2 class="text-xl font-semibold">HOT</h2>
-                    <p class="text-2xl mt-2">$ {data.hot}</p>   
+                <div class="card hot">
+                    <h3>HOT</h3>
+                    <p id="hot">0</p>
                 </div>
-                <div class="bg-yellow-100 p-6 rounded-xl shadow">
-                    <h2 class="text-xl font semibold">WARM</h2>
-                    <p class="text-2xl mt-2">$ {data.warm}</p>    
+                <div class="card warm">
+                    <h3>WARM</h3>
+                    <p id="warm">0</p>
                 </div>
-                <div class="bg-blue-100 p-6 rounded-xl shadow">
-                    <h2 class="text-xl font-semibold">COLD</h2>
-                    <p class="text-2xl mt-2">$ {data.cold}</p>    
-                </div> 
-        
-        
-        
-        
-            `;
-        }
-
-        loadStats();
-    </script>
+                <div class="card cold">
+                    <h3>COLD</h3>
+                    <p id="cold">0</p>
+                </div>
+            </div>
+        </div>
+        <script src="dashboard.js"></script>
     </body>
 </html>

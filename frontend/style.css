@@ -1,0 +1,42 @@
+body {
+    margin: 0;
+    font-family: Arial,sans-serif;
+    background: #0f172a;
+    color: white;
+
+
+}
+
+.container {
+    padding: 40px;
+}
+
+.cards {
+    display: flex;
+    gap: 20px;
+}
+
+.card {
+    background: #1e293b;
+    padding: 30px;
+    border-radius: 12px;
+    width: 200px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+}
+
+.hot {
+    background: #dc2626;
+}
+
+.warm {
+    background: #f59e0b;
+}
+
+.cold {
+    background: #3b82f6;
+}
+
+.card h3 {
+    margin-bottom: 10px;
+}
