@@ -20,8 +20,6 @@ from config.config import ADMIN_API_KEY
 
 app = FastAPI()
 
-app.mount("/ui",StaticFiles(directory="frontend",html=True),name="ui")
-
 @app.on_event("startup")
 def startup():
     return "API Running"
@@ -154,3 +152,4 @@ def export_csv(client_name : str):
 def analytics(client_name : str):
     return get_lead_stats(client_name)
 
+app.mount("/",StaticFiles(directory="frontend",html=True), name="frontend")
