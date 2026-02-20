@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from api.routers import health, leads, analytics, admin
 from fastapi.staticfiles import StaticFiles
 
-app = FastAPI("SaaS Lead Automation API")
+app = FastAPI(title="SaaS Lead Automation API",version="1.0.0",description="AI Powered Lead Automation System with Webhook Integration")
 
 app.include_router(health.router)
 
