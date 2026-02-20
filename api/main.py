@@ -1,9 +1,14 @@
 from fastapi import FastAPI
-from api.routers import health, auth, leads, analytics, admin
 from fastapi.staticfiles import StaticFiles
+from database.db import init_db
+from api.routers import health, auth, leads, analytics, admin
 
 app = FastAPI(title="SaaS Lead Automation API",version="1.0.0",description="AI Powered Lead Automation System with Webhook Integration")
 
+@app.on_event("startup")
+def startup_event():
+    init_db()
+    
 app.include_router(health.router)
 
 app.include_router(
