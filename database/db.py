@@ -24,7 +24,6 @@ def init_db():
             source TEXT,
             campaign_id TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            is_active BOOLEAN DEFAULT TRUE   
 
         );
         CREATE TABLE IF NOT EXISTS clients (
