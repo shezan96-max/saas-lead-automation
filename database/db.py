@@ -23,7 +23,7 @@ def init_db():
             sales_rep TEXT,
             source TEXT,
             campaign_id TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
         );
         CREATE TABLE IF NOT EXISTS clients (
