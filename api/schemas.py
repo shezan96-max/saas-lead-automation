@@ -7,4 +7,6 @@ class LeadCreate(BaseModel):
     company : Optional[str] = None
     budget : Optional[float] = None
     message : str
-
+    source : str
+    campaign_id : str | None = None
+    

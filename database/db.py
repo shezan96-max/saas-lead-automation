@@ -10,20 +10,43 @@ def init_db():
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS leads (
-        id SERIAL PRIMARY KEY,
-        client_name TEXT NOT NULL,
-        name TEXT,
-        email TEXT,
-        company TEXT,
-        budget INTEGER,
-        message TEXT,
-        score INTEGER,
-        status TEXT,
-        sales_rep TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP   
+        CREATE TABLE IF NOT EXISTS leads (
+            id SERIAL PRIMARY KEY,
+            client_name TEXT NOT NULL,
+            name TEXT,
+            email TEXT,
+            company TEXT,
+            budget INTEGER,
+            message TEXT,
+            score INTEGER,
+            status TEXT,
+            sales_rep TEXT,
+            source TEXT,
+            campaign_id TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP   
 
-    )
+        );
+        CREATE TABLE IF NOT EXISTS clients (
+            id SERIAL PRIMARY KEY,
+            client_name TEXT UNIQUE NOT NULL,
+            api_key TEXT NOT NULL,
+            webhook_url TEXT,
+            webhook_secret TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    
+        );
+        CREATE TABLE IF NOT EXISTS webhook_logs (
+            id SERIAL PRIMARY KEY,
+            client_name TEXT,
+            lead_email TEXT,
+            status TEXT,
+            response_code INTEGER,
+            error TEXT,
+            retry_count INTEGER DEFAULT 0,
+            next_retry TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP         
+        );
+        
     """)
     conn.commit()
     conn.close()
