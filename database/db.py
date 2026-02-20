@@ -23,12 +23,14 @@ def init_db():
             sales_rep TEXT,
             source TEXT,
             campaign_id TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP   
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            is_active BOOLEAN DEFAULT TRUE   
 
         );
         CREATE TABLE IF NOT EXISTS clients (
             id SERIAL PRIMARY KEY,
             client_name TEXT UNIQUE NOT NULL,
+            email TEXT NOT NULL,
             api_key TEXT NOT NULL,
             webhook_url TEXT,
             webhook_secret TEXT,
