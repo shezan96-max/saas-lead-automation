@@ -18,7 +18,6 @@ def submit_lead(
     x_api_key : str = Header(...)
 ):
     client_name = verify_api_key(x_api_key)
-    init_db()
 
     result = process_lead(lead, client_name, background_tasks)
 
