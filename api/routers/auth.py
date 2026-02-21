@@ -24,7 +24,7 @@ def signup(data : SignupRequest):
     cursor.execute("""
         INSERT INTO clients
         (client_name, email, api_key, webhook_url, webhook_secret, created_at)
-        VALUES (%s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s)
 
     """, (
         data.client_name,
