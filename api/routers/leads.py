@@ -17,8 +17,7 @@ def submit_lead(
     background_tasks : BackgroundTasks,
     x_api_key : str = Header(...)
 ):
-    client_name = lead.company
-    verify_api_key(client_name, x_api_key)
+    client_name = verify_api_key(x_api_key)
     init_db()
 
     result = process_lead(lead, client_name, background_tasks)

@@ -12,7 +12,7 @@ def verify_api_key(client_name: str, provided_key : str):
     if not row:
         raise HTTPException(status_code=404, detail="Client not found")
     
-    stored_key= row
+    stored_key = row
 
     if  stored_key != provided_key:
         raise HTTPException(status_code=403, detail="Invalid API Key")
