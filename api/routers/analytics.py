@@ -14,7 +14,7 @@ def conversion_rate(client_name : str):
 
     cursor.execute("""
         SELECT COUNT(*) as total,
-        SUM(CASE WHEN status='HOT' THEN 1 ELSE 0) as hot 
+        SUM(CASE WHEN status='HOT' THEN 1 ELSE 0 END) as hot 
         FROM leads
         WHERE client_name = %s
     """, (client_name,))
